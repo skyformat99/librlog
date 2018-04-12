@@ -19,5 +19,5 @@ add_subdirectory(src)
 
 set(RLOG_LIB_LOCATION "$<TARGET_FILE:${nvd}>")
 
-configure_file(CMake/nvdConfig.cmake.in
+configure_file(CMake/rlogConfig.cmake.in
         ${RLOG_BINARY_DIR}/rlogConfig.cmake @ONLY)
