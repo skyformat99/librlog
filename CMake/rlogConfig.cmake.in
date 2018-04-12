@@ -1,0 +1,5 @@
+# rlogConfig.cmake - Configuration file for external projects.
+
+set(RLOG_INCLUDE_DIRS "@RLOG_SOURCE_DIR@/include")
+set(RLOG_LIBRARY_DIRS "@RLOG_BINARY_DIR@/src")
+set(RLOG_LIBRARIES "@RLOG_LIB_LOCATION@")
