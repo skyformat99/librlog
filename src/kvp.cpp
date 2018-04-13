@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <curl/curl.h>
 
-#include "../include/message.hpp"
+#include "../include/kvp.hpp"
 
 rlog::message::kvp::kvp(std::string &key, std::string &value) noexcept {
     this->set_key(key);
@@ -48,9 +48,4 @@ std::string rlog::message::kvp::escape(std::string &str) {
 
 std::string rlog::message::kvp::get_pair() const noexcept {
     return this->key + "=" + this->value;
-}
-
-std::ostream &rlog::message::kvp::another_one(std::ostream &stream) {
-    stream << "&";
-    return stream;
 }

@@ -8,7 +8,7 @@
 #include <string>
 #include <sstream>
 
-#include "../include/message.hpp"
+#include "../include/kvp.hpp"
 
 namespace rlog {
     namespace message {

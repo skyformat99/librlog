@@ -10,6 +10,7 @@
 
 namespace rlog {
     namespace message {
+
         class kvp {
         private:
             std::string key;
@@ -21,10 +22,15 @@ namespace rlog {
             void set_value(const char *) noexcept;
             std::string escape(std::string &);
         public:
-            static std::ostream &another_one(std::ostream &);
             explicit kvp(std::string &, std::string &) noexcept;
             explicit kvp(const char *, const char *) noexcept;
             std::string get_pair() const noexcept;
+
+            friend std::ostream &operator<<(std::ostream &stream, const rlog::message::kvp &kvp) {
+                stream << "&" << kvp.get_pair();
+                return stream;
+            }
+
         };
     }
 }

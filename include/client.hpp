@@ -20,10 +20,6 @@ namespace rlog {
         CURL *get_curl_handle();
     public:
         client() noexcept;
-        client(const client &) = delete;
-        client& operator=(const client &) = delete;
-        client(client &&) = delete;
-        client& operator=(client &&) = delete;
         ~client() noexcept;
 
         nlohmann::json log_message(rlog::options &, rlog::message::stream &);
