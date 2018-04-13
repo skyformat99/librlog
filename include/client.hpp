@@ -8,21 +8,24 @@
 #include <mutex>
 #include <curl/curl.h>
 
-#include "../include/option.hpp"
+#include "../include/json.hpp"
 #include "../include/stream.hpp"
 
-namespace rlog {
+namespace remlog {
     class client {
     private:
-        std::once_flag curl_once_flag_init;
-
-        void init_libcurl();
-        CURL *get_curl_handle();
+        class libcurl {
+        private:
+            std::once_flag global_init_flag;
+            CURL *handle;
+            void init();
+        public:
+            libcurl();
+            ~libcurl() noexcept;
+            void log(const char *, const char *);
+        };
     public:
-        client() noexcept;
-        ~client() noexcept;
-
-        nlohmann::json log_message(rlog::options &, rlog::message::stream &);
+        nlohmann::json log(const std::string &, remlog::message::stream &);
     };
 }
 

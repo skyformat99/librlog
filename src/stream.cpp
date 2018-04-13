@@ -4,11 +4,11 @@
 
 #include "../include/stream.hpp"
 
-std::string rlog::message::stream::get_content() const noexcept {
+std::string remlog::message::stream::get_content() const noexcept {
     return this->message_stream.str();
 }
 
-std::ostream &rlog::message::stream::operator<<(const rlog::message::kvp &kvp) {
+std::ostream &remlog::message::stream::operator<<(const remlog::message::kvp &kvp) {
     this->message_stream << kvp.get_pair();
     return this->message_stream;
 }

@@ -1,7 +1,6 @@
 set(RLOG_SOURCE
         client.cpp
         stream.cpp
-        option.cpp
         kvp.cpp)
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")

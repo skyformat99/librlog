@@ -8,7 +8,7 @@
 #include <string>
 #include <ostream>
 
-namespace rlog {
+namespace remlog {
     namespace message {
 
         class kvp {
@@ -24,9 +24,11 @@ namespace rlog {
         public:
             explicit kvp(std::string &, std::string &) noexcept;
             explicit kvp(const char *, const char *) noexcept;
+            explicit kvp(std::string &, const char *) noexcept;
+            explicit kvp(const char *, std::string &) noexcept;
             std::string get_pair() const noexcept;
 
-            friend std::ostream &operator<<(std::ostream &stream, const rlog::message::kvp &kvp) {
+            friend std::ostream &operator<<(std::ostream &stream, const remlog::message::kvp &kvp) {
                 stream << "&" << kvp.get_pair();
                 return stream;
             }

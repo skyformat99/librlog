@@ -4,51 +4,42 @@
 
 #include "../include/client.hpp"
 
-rlog::client::client() noexcept {
-    std::call_once(this->curl_once_flag_init, &rlog::client::init_libcurl, this);
+remlog::client::libcurl::libcurl() {
+    std::call_once(this->global_init_flag, &remlog::client::libcurl::init, this);
+    this->handle = curl_easy_init();
+    if (this->handle == nullptr) {
+        throw std::runtime_error("Can not initialize libcurl easy handle!");
+    }
 }
 
-rlog::client::~client() noexcept {
+remlog::client::libcurl::~libcurl() noexcept {
+    if (this->handle != nullptr) {
+        curl_easy_cleanup(this->handle);
+    }
     curl_global_cleanup();
 }
 
-void rlog::client::init_libcurl() {
+void remlog::client::libcurl::init() {
     const CURLcode result = curl_global_init(CURL_GLOBAL_ALL);
     if (result != CURLE_OK) {
         throw std::runtime_error(curl_easy_strerror(result));
     }
 }
 
-CURL *rlog::client::get_curl_handle() {
-    CURL *curl_handle = curl_easy_init();
-    if (curl_handle == nullptr) {
-        throw std::runtime_error("Can not initialize libcurl easy handle!");
-    }
-    return curl_handle;
-}
-
-nlohmann::json rlog::client::log_message(rlog::options &options, rlog::message::stream &message) {
-    CURL *curl_handle = this->get_curl_handle();
-    curl_easy_setopt(curl_handle, CURLOPT_URL, options.get_url().c_str());
-    curl_easy_setopt(curl_handle, CURLOPT_VERBOSE, false);
-    curl_easy_setopt(curl_handle, CURLOPT_POST, true);
-
-    std::string post_data = message.get_content();
-    curl_easy_setopt(curl_handle, CURLOPT_POSTFIELDS, post_data.c_str());
-
-    /*struct curl_slist *chunk = nullptr;
-    chunk = curl_slist_append(chunk, "Content-type: application/json");
-    curl_easy_setopt(curl_handle, CURLOPT_HTTPHEADER, chunk);*/
-
-
-    const CURLcode result = curl_easy_perform(curl_handle);
+void remlog::client::libcurl::log(const char *url, const char *message) {
+    curl_easy_setopt(this->handle, CURLOPT_URL, url);
+    curl_easy_setopt(this->handle, CURLOPT_VERBOSE, false);
+    curl_easy_setopt(this->handle, CURLOPT_POST, true);
+    curl_easy_setopt(this->handle, CURLOPT_POSTFIELDS, message);
+    const CURLcode result = curl_easy_perform(this->handle);
     if (result != CURLE_OK) {
-        //curl_slist_free_all(chunk);
-        curl_easy_cleanup(curl_handle);
         throw std::runtime_error(curl_easy_strerror(result));
     }
-    //curl_slist_free_all(chunk);
-    curl_easy_cleanup(curl_handle);
+}
+
+nlohmann::json remlog::client::log(const std::string &url, remlog::message::stream &message) {
+    remlog::client::libcurl curl;
+    curl.log(url.c_str(), message.get_content().c_str());
 
     nlohmann::json response;
     return response;

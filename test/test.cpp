@@ -1,4 +1,3 @@
-#include "option.hpp"
 #include "client.hpp"
 #include "stream.hpp"
 #include "kvp.hpp"
@@ -7,38 +6,32 @@
 #include <cstdlib>
 #include <thread>
 #include <sstream>
+#include <chrono>
 
 void function() {
-    auto myid = std::this_thread::get_id();
-    std::stringstream ss;
-    ss << myid;
-    std::string tid = ss.str();
-    std::string msg = "message";
+    std::stringstream tid_stream;
+    tid_stream << std::this_thread::get_id();
+    std::string tid_string = tid_stream.str();
+    std::string message("Hello from " + tid_string);
 
-    rlog::message::stream message_stream_builder;
-    message_stream_builder << rlog::message::kvp(msg, tid);
+    remlog::message::stream message_stream_builder;
 
-    rlog::client client;
-    rlog::options options("http://localhost:8080/test", "log");
+    message_stream_builder
+            << remlog::message::kvp("req_id", tid_string)
+            << remlog::message::kvp("message", message)
+            << remlog::message::kvp("log_name", "mylog");
 
-    client.log_message(options, message_stream_builder);
-
+    remlog::client client;
+    client.log("http://localhost:8080/test", message_stream_builder);
 }
 
 int main(int argc, char **argv) {
-
-    rlog::client client;
-    rlog::options options("http://localhost:8080/test", "log");
-
-    std::array<std::thread, 50> pool;
-
-    for (int i = 0; i < 50; ++i) {
+    std::array<std::thread, 2> pool;
+    for (int i = 0; i < 2; ++i) {
         pool[i] = std::move(std::thread(function));
     }
-
-    for (int i = 0; i < 50; ++i) {
+    for (int i = 0; i < 2; ++i) {
         pool[i].join();
     }
-
     exit(EXIT_SUCCESS);
 }

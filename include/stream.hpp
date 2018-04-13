@@ -10,7 +10,7 @@
 
 #include "../include/kvp.hpp"
 
-namespace rlog {
+namespace remlog {
     namespace message {
 
         class stream {
@@ -19,7 +19,7 @@ namespace rlog {
         public:
             stream() = default;
             std::string get_content() const noexcept;
-            std::ostream &operator<<(const rlog::message::kvp &);
+            std::ostream &operator<<(const remlog::message::kvp &);
         };
     }
 }
