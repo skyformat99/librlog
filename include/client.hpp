@@ -8,9 +8,8 @@
 #include <mutex>
 #include <curl/curl.h>
 
-#include "../include/client.hpp"
 #include "../include/option.hpp"
-#include "stream.hpp"
+#include "../include/stream.hpp"
 
 namespace rlog {
     class client {

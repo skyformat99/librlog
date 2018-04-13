@@ -7,7 +7,8 @@
 
 #include <string>
 #include <sstream>
-#include <utility>
+
+#include "../include/message.hpp"
 
 namespace rlog {
     namespace message {
@@ -15,28 +16,10 @@ namespace rlog {
         class stream {
         private:
             std::stringstream message_stream;
-        protected:
-            static std::string escape(const std::string &);
         public:
-
-            class key {
-            private:
-                const std::string _key;
-            public:
-                friend std::string rlog::message::stream::escape(const std::string &);
-
-                explicit key(std::string key) : _key(std::move(key)) {};
-                std::string get() const {
-                    return this->_key;
-                }
-            };
-
             stream() = default;
             std::string get_content() const noexcept;
-            std::ostream &operator<<(const rlog::message::stream::key &key) {
-                this->message_stream << key.get();
-                return this->message_stream;
-            }
+            std::ostream &operator<<(const rlog::message::kvp &);
         };
     }
 }
