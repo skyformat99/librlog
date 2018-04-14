@@ -8,7 +8,7 @@
 #include <string>
 #include <sstream>
 
-#include "../include/kvp.hpp"
+#include "../include/key_value.hpp"
 
 namespace remlog {
     namespace message {
@@ -19,8 +19,14 @@ namespace remlog {
         public:
             stream() = default;
             std::string get_content() const noexcept;
-            std::ostream &operator<<(const remlog::message::kvp &);
+            template<class T> std::ostream &operator<<(const remlog::message::key_value<T> &);
         };
+
+        template<class T>
+        std::ostream &remlog::message::stream::operator<<(const remlog::message::key_value<T> &kvp) {
+            this->message_stream << kvp.get_pair();
+            return this->message_stream;
+        }
     }
 }
 

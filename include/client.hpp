@@ -6,26 +6,35 @@
 #define RLOG_LOGGER_HPP
 
 #include <mutex>
-#include <curl/curl.h>
+#include <future>
 
 #include "../include/json.hpp"
 #include "../include/stream.hpp"
 
 namespace remlog {
+
     class client {
-    private:
-        class libcurl {
+    protected:
+        class curl_client {
         private:
             std::once_flag global_init_flag;
             CURL *handle;
             void init();
         public:
-            libcurl();
-            ~libcurl() noexcept;
+            curl_client();
+            ~curl_client() noexcept;
             void log(const char *, const char *);
         };
     public:
-        nlohmann::json log(const std::string &, remlog::message::stream &);
+        virtual ~client() = default;
+        virtual void log(const std::string &, remlog::message::stream &);
+    };
+
+    class async_client : public client {
+    public:
+        async_client() : client() {}
+        ~async_client() override = default;
+        void log(const std::string &, remlog::message::stream &) override;
     };
 }
 
