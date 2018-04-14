@@ -12,7 +12,7 @@ include_directories(${CURL_INCLUDE_DIRS}
         ${RLOG_SOURCE_DIR}/include)
 
 file(GLOB HEADER_LIST "${CMAKE_SOURCE_DIR}/include/*.hpp")
-install (FILES ${HEADER_LIST} DESTINATION include)
+install (FILES ${HEADER_LIST} DESTINATION include/rlog)
 
 # Set up source directories
 add_subdirectory(src)

@@ -8,32 +8,40 @@
 #include <mutex>
 #include <future>
 
-#include "../include/json.hpp"
-#include "../include/stream.hpp"
+#include "stream.hpp"
+#include "url.hpp"
+
+namespace {
+	using write_callback_ptr_type = size_t(*)(void *,size_t,size_t,void *);
+
+	size_t write_callback(void *contents, size_t size, size_t nmemb, void *userp) {
+		const size_t realsize = size * nmemb;
+		auto const stream = static_cast<std::stringstream *>(userp);
+		stream->write(static_cast<const char *>(contents), realsize);
+		return realsize;
+	}
+}
 
 namespace remlog {
 
     class client {
-    private:
-        class curl_client {
-        private:
-            std::once_flag global_init;
-            void init();
-        public:
-            curl_client();
-            ~curl_client() noexcept;
-            CURLcode log(std::string, std::string);
-        };
-        remlog::client::curl_client libcurl_client;
-    protected:
-        CURLcode _log_util(std::string &, remlog::message::stream &);
-        std::future<CURLcode> _async_log_util(std::string, remlog::message::stream &);
     public:
-        virtual ~client() = default;
-        CURLcode log(std::string &, remlog::message::stream &);
-        CURLcode log(const char *, remlog::message::stream &);
-        std::future<CURLcode> async_log(std::string &, remlog::message::stream &);
-        std::future<CURLcode> async_log(const char *, remlog::message::stream &);
+	    using result = std::pair<CURLcode, std::unique_ptr<std::stringstream>>;
+
+	    virtual ~client() = default;
+        client::result log(remlog::url &, remlog::message::stream &);
+        std::future<client::result> async_log(remlog::url &, remlog::message::stream &);
+    private:
+	    class curl {
+	    private:
+		    std::once_flag global_init;
+		    void init();
+	    public:
+		    curl();
+		    ~curl() noexcept;
+		    client::result log(std::string, std::string);
+	    };
+	    remlog::client::curl curl_client;
     };
 }
 

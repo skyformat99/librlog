@@ -8,7 +8,7 @@
 #include <string>
 #include <sstream>
 
-#include "../include/key_value.hpp"
+#include "key_value.hpp"
 
 namespace remlog {
     namespace message {

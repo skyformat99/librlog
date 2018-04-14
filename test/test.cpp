@@ -1,17 +1,19 @@
-#include "client.hpp"
-#include "stream.hpp"
-#include "key_value.hpp"
+#include "rlog/client.hpp"
+#include "rlog/stream.hpp"
+#include "rlog/key_value.hpp"
 
 #include <iostream>
 #include <cstdlib>
 #include <thread>
-#include <sstream>
+#include <vector>
 
-std::vector<std::future<CURLcode>> futures;
+std::vector<std::future<remlog::client::result>> futures;
 std::mutex mutex;
 
 
 void function() {
+
+	remlog::url url("http://httpbin.org/post");
     remlog::message::stream message_stream_builder;
 
     remlog::message::key_value<std::thread::id> tid_msg("request_id", std::this_thread::get_id());
@@ -21,7 +23,7 @@ void function() {
     message_stream_builder << tid_msg << hello_message << log_name;
 
     remlog::client client;
-    auto result = client.async_log("http://httpbin.org/post", message_stream_builder);
+    auto result = client.async_log(url, message_stream_builder);
 
     mutex.lock();
     futures.push_back(std::move(result));
@@ -39,9 +41,8 @@ int main(int argc, char **argv) {
         pool[i].join();
     }
 
-    std::cout<<"WAITING"<<std::endl;
     for (int i = 0; i < n; ++i) {
-        std::cout<<curl_easy_strerror(futures[i].get())<<std::endl;
+        std::cout<< futures[i].get().second->str()<<std::endl;
     }
     exit(EXIT_SUCCESS);
 }
