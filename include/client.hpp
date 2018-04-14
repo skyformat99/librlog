@@ -14,27 +14,26 @@
 namespace remlog {
 
     class client {
-    protected:
+    private:
         class curl_client {
         private:
-            std::once_flag global_init_flag;
-            CURL *handle;
+            std::once_flag global_init;
             void init();
         public:
             curl_client();
             ~curl_client() noexcept;
-            void log(const char *, const char *);
+            CURLcode log(std::string, std::string);
         };
+        remlog::client::curl_client libcurl_client;
+    protected:
+        CURLcode _log_util(std::string &, remlog::message::stream &);
+        std::future<CURLcode> _async_log_util(std::string, remlog::message::stream &);
     public:
         virtual ~client() = default;
-        virtual void log(const std::string &, remlog::message::stream &);
-    };
-
-    class async_client : public client {
-    public:
-        async_client() : client() {}
-        ~async_client() override = default;
-        void log(const std::string &, remlog::message::stream &) override;
+        CURLcode log(std::string &, remlog::message::stream &);
+        CURLcode log(const char *, remlog::message::stream &);
+        std::future<CURLcode> async_log(std::string &, remlog::message::stream &);
+        std::future<CURLcode> async_log(const char *, remlog::message::stream &);
     };
 }
 

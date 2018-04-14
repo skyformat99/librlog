@@ -5,17 +5,10 @@
 #include "../include/client.hpp"
 
 remlog::client::curl_client::curl_client() {
-    std::call_once(this->global_init_flag, &remlog::client::curl_client::init, this);
-    this->handle = curl_easy_init();
-    if (this->handle == nullptr) {
-        throw std::runtime_error("Can not initialize libcurl easy handle!");
-    }
+    std::call_once(this->global_init, &remlog::client::curl_client::init, this);
 }
 
 remlog::client::curl_client::~curl_client() noexcept {
-    if (this->handle != nullptr) {
-        curl_easy_cleanup(this->handle);
-    }
     curl_global_cleanup();
 }
 
@@ -26,27 +19,52 @@ void remlog::client::curl_client::init() {
     }
 }
 
-void remlog::client::curl_client::log(const char * url, const char *message) {
-    curl_easy_setopt(this->handle, CURLOPT_URL, url);
-    curl_easy_setopt(this->handle, CURLOPT_POST, true);
-    curl_easy_setopt(this->handle, CURLOPT_VERBOSE, false);
-    curl_easy_setopt(this->handle, CURLOPT_POSTFIELDS, message);
+CURLcode remlog::client::curl_client::log(std::string url, std::string message) {
+    CURL *handle = curl_easy_init();
+    curl_easy_setopt(handle, CURLOPT_URL, url.c_str());
+    curl_easy_setopt(handle, CURLOPT_POST, true);
+    curl_easy_setopt(handle, CURLOPT_VERBOSE, false);
+    curl_easy_setopt(handle, CURLOPT_POSTFIELDS, message.c_str());
     struct curl_slist *chunk = nullptr;
     curl_slist_append(chunk, "Content-Type: text/json");
-    curl_easy_setopt(this->handle, CURLOPT_HTTPHEADER, chunk);
-    const CURLcode result = curl_easy_perform(this->handle);
+    curl_easy_setopt(handle, CURLOPT_HTTPHEADER, chunk);
+    const CURLcode result = curl_easy_perform(handle);
     curl_slist_free_all(chunk);
     if (result != CURLE_OK) {
+        curl_easy_cleanup(handle);
         throw std::runtime_error(curl_easy_strerror(result));
     }
+    curl_easy_cleanup(handle);
+    return result;
 }
 
-void remlog::client::log(const std::string &url, remlog::message::stream &message) {
-    remlog::client::curl_client curl_client;
-    curl_client.log(url.c_str(), message.get_content().c_str());
+CURLcode remlog::client::_log_util(std::string &url, remlog::message::stream &message) {
+    return this->libcurl_client.log(url, message.get_content());
 }
 
-void remlog::async_client::log(const std::string &url, remlog::message::stream &message) {
-    remlog::client::curl_client curl_client;
-    curl_client.log(url.c_str(), message.get_content().c_str());
+std::future<CURLcode> remlog::client::_async_log_util(std::string url, remlog::message::stream &message) {
+    return std::async(
+            std::launch::async,
+            &remlog::client::curl_client::log,
+            std::ref(this->libcurl_client),
+            std::move(url),
+            std::move(message.get_content())
+    );
+}
+
+CURLcode remlog::client::log(std::string &url, remlog::message::stream &message) {
+    return this->_log_util(url, message);
+}
+
+CURLcode remlog::client::log(const char *url, remlog::message::stream &message) {
+    std::string string_url(url);
+    return this->_log_util(string_url, message);
+}
+
+std::future<CURLcode> remlog::client::async_log(std::string &url, remlog::message::stream &message) {
+    return this->_async_log_util(url, message);
+}
+
+std::future<CURLcode> remlog::client::async_log(const char *url, remlog::message::stream &message) {
+    return this->_async_log_util(std::string(url), message);
 }
