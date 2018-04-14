@@ -27,7 +27,6 @@ namespace remlog {
     class client {
     public:
 	    using result = std::pair<CURLcode, std::unique_ptr<std::stringstream>>;
-
 	    virtual ~client() = default;
         client::result log(remlog::url &, remlog::message::stream &);
         std::future<client::result> async_log(remlog::url &, remlog::message::stream &);
