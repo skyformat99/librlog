@@ -8,6 +8,17 @@
 #include <sstream>
 #include <chrono>
 
+class myclass {
+private:
+    std::string data;
+public:
+    explicit myclass(std::string d) : data(d) {};
+    friend std::ostream &operator<<(std::ostream &stream, const myclass &obj) {
+        stream << obj.data;
+        return stream;
+    }
+};
+
 void function() {
 
     remlog::message::stream message_stream_builder;
@@ -15,8 +26,9 @@ void function() {
     remlog::message::key_value<std::__thread_id> tid_msg("request_id", std::this_thread::get_id());
     remlog::message::key_value<std::string> hello_message("message", "Hello world!");
     remlog::message::key_value<std::string> log_name("log_name", "application.log");
+    remlog::message::key_value<myclass> class_object("class_name", myclass("mydata-test"));
 
-    message_stream_builder << tid_msg << hello_message << log_name;
+    message_stream_builder << tid_msg << hello_message << log_name << class_object;
 
     remlog::client as_client;
     as_client.log("http://localhost:8080/test", message_stream_builder);
