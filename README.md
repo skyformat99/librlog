@@ -20,7 +20,7 @@ The headers will be located under ```/usr/local/include/rlog```
 Let's go straight to the examples. Let's suppose you have a webserver running on 8080 port and you want to log
 certain event. Suppose your server url is http://localhost:8080/myendpoint and this endpoint accepts a POST request.
 
-# Log and event synchronously
+# Log an event synchronously
 Here's an example on how to log an event in a synchronous way.
 
 ```c++
