@@ -46,7 +46,7 @@ remlog::response remlog::client::curl::log(const std::string url, const std::str
     return response;
 }
 
-remlog::response remlog::client::log(remlog::url &url, remlog::message::stream &message) {
+remlog::response remlog::client::log(const remlog::url &url, const remlog::message::stream &message) {
 	return this->curl_client.log(url.get(), message.get());
 }
 

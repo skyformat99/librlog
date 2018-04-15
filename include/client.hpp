@@ -42,7 +42,7 @@ namespace remlog {
 	    remlog::client::curl curl_client;
     public:
 	    ~client() = default;
-        remlog::response log(remlog::url &, remlog::message::stream &);
+        remlog::response log(const remlog::url &, const remlog::message::stream &);
 	    std::future<remlog::response> async_log(const remlog::url &, const remlog::message::stream &);
     };
 }
