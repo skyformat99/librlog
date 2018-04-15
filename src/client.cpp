@@ -21,7 +21,7 @@ void remlog::client::curl::init() {
     }
 }
 
-remlog::client::result remlog::client::curl::log(std::string url, std::string message) {
+remlog::response remlog::client::curl::log(const std::string url, const std::string message) {
     CURL *handle = curl_easy_init();
 
     curl_easy_setopt(handle, CURLOPT_URL, url.c_str());
@@ -29,7 +29,7 @@ remlog::client::result remlog::client::curl::log(std::string url, std::string me
     curl_easy_setopt(handle, CURLOPT_VERBOSE, false);
     curl_easy_setopt(handle, CURLOPT_POSTFIELDS, message.c_str());
 
-	write_callback_ptr_type write_function_ptr = write_callback;
+	write_callback_ptr_type write_function_ptr = write_callback<std::stringstream>;
 	curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, write_function_ptr);
 	std::unique_ptr<std::stringstream> stream_ptr(new std::stringstream);
     curl_easy_setopt(handle, CURLOPT_WRITEDATA, static_cast<void *>(stream_ptr.get()));
@@ -38,23 +38,23 @@ remlog::client::result remlog::client::curl::log(std::string url, std::string me
     curl_slist_append(chunk, "Content-Type: text/json");
     curl_easy_setopt(handle, CURLOPT_HTTPHEADER, chunk);
 
-    CURLcode result = curl_easy_perform(handle);
+    CURLcode code = curl_easy_perform(handle);
     curl_slist_free_all(chunk);
     curl_easy_cleanup(handle);
 
-    return std::make_pair(result, std::move(stream_ptr));
+    remlog::response response(stream_ptr->str(), code);
+    return response;
 }
 
-remlog::client::result remlog::client::log(remlog::url &url, remlog::message::stream &message) {
-	return this->curl_client.log(url.get(), message.get_content());
+remlog::response remlog::client::log(remlog::url &url, remlog::message::stream &message) {
+	return this->curl_client.log(url.get(), message.get());
 }
 
-std::future<remlog::client::result> remlog::client::async_log(remlog::url &url, remlog::message::stream &message) {
-    return std::async(
-		    std::launch::async,
-		    &remlog::client::curl::log,
-		    std::ref(this->curl_client),
-		    std::move(url.get()),
-		    std::move(message.get_content())
-    );
+
+std::future<remlog::response> remlog::client::async_log(
+		const remlog::url &url, const remlog::message::stream &message) {
+	return std::async(std::launch::async, &remlog::client::curl::log, std::ref(this->curl_client),
+	                  url.get(),
+	                  message.get()
+	);
 }

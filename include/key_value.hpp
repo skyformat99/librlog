@@ -5,6 +5,7 @@
 #ifndef RLOG_KEY_HPP
 #define RLOG_KEY_HPP
 
+#include <iostream>
 #include <string>
 #include <ostream>
 #include <sstream>
@@ -20,67 +21,61 @@ namespace remlog {
             std::string key;
             std::string value;
         protected:
-            void set_key(std::string &);
-            void set_value(T &);
+            void set_key(const std::string &);
+            void set_value(const T &);
             std::string escape(std::string &);
         public:
-            explicit key_value(std::string &, T &);
-            explicit key_value(std::string, T &);
-            explicit key_value(std::string &, T);
-            explicit key_value(const char *, T &);
-            explicit key_value(const char *, T);
-            std::string get_pair() const noexcept;
+	        explicit key_value(const std::string &, const T &);
+	        explicit key_value(const std::string &&, const T &);
+	        explicit key_value(const std::string &, const T &&);
+	        explicit key_value(const std::string &&, const T &&);
+	        std::string get() const noexcept;
+
             friend std::ostream &operator<<(std::ostream &stream, const remlog::message::key_value<T> &kvp) {
-                stream << "&" << kvp.get_pair();
+                stream << "&" << kvp.get();
                 return stream;
             }
         };
 
         template<class T>
-        remlog::message::key_value<T>::key_value(std::string &key, T &value) {
+        remlog::message::key_value<T>::key_value(const std::string &key, const T &value) {
             this->set_key(key);
             this->set_value(value);
         }
 
-        template<class T>
-        remlog::message::key_value<T>::key_value(std::string key, T &value) {
-            this->set_key(key);
-            this->set_value(value);
-        }
+	    template<class T>
+	    remlog::message::key_value<T>::key_value(const std::string &&key, const T &value) {
+        	this->set_key(key);
+		    this->set_value(value);
+	    }
+
+	    template<class T>
+	    remlog::message::key_value<T>::key_value(const std::string &key, const T &&value) {
+		    this->set_key(key);
+		    this->set_value(value);
+	    }
+
+	    template<class T>
+	    remlog::message::key_value<T>::key_value(const std::string &&key, const T &&value) {
+		    this->set_key(key);
+		    this->set_value(value);
+	    }
 
         template<class T>
-        remlog::message::key_value<T>::key_value(std::string &key, T value) {
-            this->set_key(key);
-            this->set_value(value);
-        }
-
-        template<class T>
-        remlog::message::key_value<T>::key_value(const char *key, T &value) {
-            std::string tmp(key);
-            this->set_key(tmp);
-            this->set_value(value);
-        }
-
-        template<class T>
-        remlog::message::key_value<T>::key_value(const char *key, T value) {
-            std::string tmp(key);
-            this->set_key(tmp);
-            this->set_value(value);
-        }
-
-        template<class T>
-        std::string remlog::message::key_value<T>::get_pair() const noexcept {
+        std::string remlog::message::key_value<T>::get() const noexcept {
             return this->key + "=" + this->value;
         }
 
         template<class T>
-        void remlog::message::key_value<T>::set_key(std::string &key) {
-            key.erase(std::remove(key.begin(), key.end(), ' '), key.end());
-            this->key = key;
+        void remlog::message::key_value<T>::set_key(const std::string &key) {
+        	std::string _key(key);
+        	auto key_end = _key.end();
+	        _key.erase(std::remove(_key.begin(), key_end, ' '), key_end);
+	        this->key = key;
         }
 
         template<class T>
-        void remlog::message::key_value<T>::set_value(T &value) {
+        void remlog::message::key_value<T>::set_value(const T &value) {
             std::stringstream ss;
             ss << value;
             std::string temp_value(std::move(ss.str()));

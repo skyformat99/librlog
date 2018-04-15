@@ -18,13 +18,13 @@ namespace remlog {
             std::stringstream message_stream;
         public:
             stream() = default;
-            std::string get_content() const noexcept;
+            std::string get() const noexcept;
             template<class T> std::ostream &operator<<(const remlog::message::key_value<T> &);
         };
 
         template<class T>
         std::ostream &remlog::message::stream::operator<<(const remlog::message::key_value<T> &kvp) {
-            this->message_stream << kvp.get_pair();
+            this->message_stream << kvp.get();
             return this->message_stream;
         }
     }

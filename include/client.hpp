@@ -10,13 +10,15 @@
 
 #include "stream.hpp"
 #include "url.hpp"
+#include "response.hpp"
 
 namespace {
 	using write_callback_ptr_type = size_t(*)(void *,size_t,size_t,void *);
 
+	template<class T>
 	size_t write_callback(void *contents, size_t size, size_t nmemb, void *userp) {
 		const size_t realsize = size * nmemb;
-		auto const stream = static_cast<std::stringstream *>(userp);
+		auto const stream = static_cast<T *>(userp);
 		stream->write(static_cast<const char *>(contents), realsize);
 		return realsize;
 	}
@@ -24,12 +26,8 @@ namespace {
 
 namespace remlog {
 
+
     class client {
-    public:
-	    using result = std::pair<CURLcode, std::unique_ptr<std::stringstream>>;
-	    virtual ~client() = default;
-        client::result log(remlog::url &, remlog::message::stream &);
-        std::future<client::result> async_log(remlog::url &, remlog::message::stream &);
     private:
 	    class curl {
 	    private:
@@ -38,9 +36,14 @@ namespace remlog {
 	    public:
 		    curl();
 		    ~curl() noexcept;
-		    client::result log(std::string, std::string);
+		    remlog::response log(std::string, std::string);
 	    };
+
 	    remlog::client::curl curl_client;
+    public:
+	    ~client() = default;
+        remlog::response log(remlog::url &, remlog::message::stream &);
+	    std::future<remlog::response> async_log(const remlog::url &, const remlog::message::stream &);
     };
 }
 

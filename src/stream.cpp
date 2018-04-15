@@ -4,6 +4,6 @@
 
 #include "../include/stream.hpp"
 
-std::string remlog::message::stream::get_content() const noexcept {
+std::string remlog::message::stream::get() const noexcept {
     return this->message_stream.str();
 }
