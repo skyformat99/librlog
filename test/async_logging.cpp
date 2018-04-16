@@ -30,7 +30,8 @@ int main(int argc, char **argv) {
 	remlog::response response = future_response.get();
 
 	// Print the server response code and the entire response.
-	std::cout << "CODE: " << response.get_code() << " RESPONSE: " << response.get_response() << std::endl;
+	std::cout << "CODE: " << response.get_code() << std::endl <<
+			  " RESPONSE: " << response.get_response() << std::endl;
 
     return 0;
 }

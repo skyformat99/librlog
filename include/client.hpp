@@ -26,7 +26,6 @@ namespace {
 
 namespace remlog {
 
-
     class client {
     private:
 	    class curl {
@@ -35,13 +34,18 @@ namespace remlog {
 		    void init();
 	    public:
 		    curl();
+		    curl(const curl &) = delete;
+            curl& operator=(const curl&) = delete;
 		    ~curl() noexcept;
 		    remlog::response log(std::string, std::string);
 	    };
 
 	    remlog::client::curl curl_client;
     public:
+        client() = default;
 	    ~client() = default;
+	    client(const client &) = delete;
+	    client& operator=(const client &) = delete;
         remlog::response log(const remlog::url &, const remlog::message::stream &);
 	    std::future<remlog::response> async_log(const remlog::url &, const remlog::message::stream &);
     };

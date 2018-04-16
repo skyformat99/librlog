@@ -9,6 +9,12 @@
 
 #include <iostream>
 #include <thread>
+#include <mutex>
+
+// If we want to put every response in a vector, this must be thread safe.
+std::mutex mutex;
+std::vector<remlog::response> responses;
+
 
 void first_worker(const remlog::url &url) {
 	// Create a stream builder.
@@ -25,6 +31,11 @@ void first_worker(const remlog::url &url) {
 	// Istantiate the client. This is thread safe, so you could pass it as parameter.
 	remlog::client client;
 	remlog::response response = client.log(url, message_stream_builder);
+
+	// Add the response in the global vector.
+	mutex.lock();
+	responses.emplace_back(response);
+	mutex.unlock();
 }
 
 void second_worker(const remlog::url &url) {
@@ -42,6 +53,11 @@ void second_worker(const remlog::url &url) {
 	// Istantiate the client. This is thread safe, so you could pass it as parameter.
 	remlog::client client;
 	remlog::response response = client.log(url, message_stream_builder);
+
+	// Add the response in the global vector.
+	mutex.lock();
+	responses.emplace_back(response);
+	mutex.unlock();
 }
 
 int main(int argc, char **argv) {
@@ -54,6 +70,10 @@ int main(int argc, char **argv) {
 
 	worker_1.join();
 	worker_2.join();
+
+	for (auto const &response : responses) {
+		std::cout << "CODE: " << response.get_code() << " MESSAGE: " << response.get_response() << std::endl;
+	}
 
 	return 0;
 }
