@@ -10,6 +10,7 @@
 #include <iostream>
 #include <thread>
 #include <mutex>
+#include <vector>
 
 // If we want to put every response in a vector, this must be thread safe.
 std::mutex mutex;
@@ -74,6 +75,5 @@ int main(int argc, char **argv) {
 	for (auto const &response : responses) {
 		std::cout << "CODE: " << response.get_code() << " MESSAGE: " << response.get_response() << std::endl;
 	}
-
 	return 0;
 }

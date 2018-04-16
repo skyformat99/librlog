@@ -11,12 +11,12 @@
 namespace remlog {
 	class response {
 	private:
-		const std::string _response;
+		const std::string server_response;
 		const CURLcode code;
 	public:
 		explicit response(const std::string &&, const CURLcode);
 		const CURLcode get_code() const noexcept;
-		const std::string get_response() const noexcept;
+		const std::string get_server_response() const noexcept;
 	};
 }
 
