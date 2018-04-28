@@ -1,1 +1,8 @@
+title: librlog
+description: C++ object oriented remote logging library
+google_analytics: UA-64151023-8
+show_downloads: true
 theme: jekyll-theme-hacker
+
+gems:
+  - jekyll-mentions
