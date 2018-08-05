@@ -24,11 +24,6 @@ certain event. Suppose your server url is http://localhost:8080/myendpoint and t
 Here's an example on how to log an event in a synchronous way.
 
 ```c++
-//
-// Created by giuseppe on 15/04/18.
-// This example shows how to log an event synchronously.
-//
-
 #include "rlog/client.hpp"
 #include "rlog/stream.hpp"
 #include "rlog/key_value.hpp"
@@ -61,11 +56,6 @@ Now suppose you want to log an event but you don't want to wait the server to re
 execute and more important computations to do:
 
 ```c++
-//
-// Created by giuseppe on 15/04/18.
-// This example shows how to log an event asynchronously.
-//
-
 #include "rlog/client.hpp"
 #include "rlog/stream.hpp"
 #include "rlog/key_value.hpp"
@@ -104,11 +94,6 @@ Now suppose you are in a multithreading environment and you have threads that wa
 synchronous way. You can easly do:
 
 ```c++
-//
-// Created by giuseppe on 15/04/18.
-// This example shows how to log events synchronously from multiple threads
-//
-
 #include "rlog/client.hpp"
 #include "rlog/stream.hpp"
 #include "rlog/key_value.hpp"
