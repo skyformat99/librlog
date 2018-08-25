@@ -1,9 +1,6 @@
-//
-// Created by Giuseppe Persico on 12/04/2018.
-//
+#include "stream.hpp"
 
-#include "../include/stream.hpp"
 
-std::string remlog::message::stream::get() const noexcept {
+std::string rlog::message::stream::get() const noexcept {
     return this->message_stream.str();
 }

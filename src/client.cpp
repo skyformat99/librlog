@@ -1,27 +1,24 @@
-//
-// Created by Giuseppe Persico on 12/04/2018.
-//
-
 #include "client.hpp"
 
 #include <utility>
 
-remlog::client::curl::curl() {
-    std::call_once(this->global_init, &remlog::client::curl::init, this);
+
+rlog::client::curl::curl() {
+    std::call_once(this->global_init, &rlog::client::curl::init, this);
 }
 
-remlog::client::curl::~curl() noexcept {
+rlog::client::curl::~curl() noexcept {
     curl_global_cleanup();
 }
 
-void remlog::client::curl::init() {
+void rlog::client::curl::init() {
     const CURLcode result = curl_global_init(CURL_GLOBAL_ALL);
     if (result != CURLE_OK) {
         throw std::runtime_error(curl_easy_strerror(result));
     }
 }
 
-remlog::response remlog::client::curl::log(const std::string url, const std::string message) {
+rlog::response rlog::client::curl::log(const std::string url, const std::string message) {
     CURL *handle = curl_easy_init();
 
     curl_easy_setopt(handle, CURLOPT_URL, url.c_str());
@@ -42,18 +39,18 @@ remlog::response remlog::client::curl::log(const std::string url, const std::str
     curl_slist_free_all(chunk);
     curl_easy_cleanup(handle);
 
-    remlog::response response(stream_ptr->str(), code);
+    rlog::response response(stream_ptr->str(), code);
     return response;
 }
 
-remlog::response remlog::client::log(const remlog::url &url, const remlog::message::stream &message) {
+rlog::response rlog::client::log(const rlog::url &url, const rlog::message::stream &message) {
 	return this->curl_client.log(url.get(), message.get());
 }
 
 
-std::future<remlog::response> remlog::client::async_log(
-		const remlog::url &url, const remlog::message::stream &message) {
-	return std::async(std::launch::async, &remlog::client::curl::log, std::ref(this->curl_client),
+std::future<rlog::response> rlog::client::async_log(
+		const rlog::url &url, const rlog::message::stream &message) {
+	return std::async(std::launch::async, &rlog::client::curl::log, std::ref(this->curl_client),
 	                  url.get(),
 	                  message.get()
 	);

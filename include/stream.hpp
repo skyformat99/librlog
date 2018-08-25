@@ -1,16 +1,38 @@
-//
-// Created by Giuseppe Persico on 12/04/2018.
-//
+/**
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2018 - Giuseppe Persico
+ * File - stream.hpp
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 
-#ifndef RLOG_MESSAGE_HPP
-#define RLOG_MESSAGE_HPP
+#ifndef RLOG_STREAM_HPP
+#define RLOG_STREAM_HPP
 
 #include <string>
 #include <sstream>
 
 #include "key_value.hpp"
 
-namespace remlog {
+
+namespace rlog {
     namespace message {
 
         class stream {
@@ -19,15 +41,15 @@ namespace remlog {
         public:
             stream() = default;
             std::string get() const noexcept;
-            template<class T> std::ostream &operator<<(const remlog::message::key_value<T> &);
+            template<class T> std::ostream &operator<<(const rlog::message::key_value<T> &);
         };
 
         template<class T>
-        std::ostream &remlog::message::stream::operator<<(const remlog::message::key_value<T> &kvp) {
+        std::ostream &rlog::message::stream::operator<<(const rlog::message::key_value<T> &kvp) {
             this->message_stream << kvp.get();
             return this->message_stream;
         }
     }
 }
 
-#endif //RLOG_MESSAGE_HPP
+#endif //RLOG_STREAM_HPP
